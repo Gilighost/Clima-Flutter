@@ -2,7 +2,7 @@ import 'package:geolocator/geolocator.dart';
 
 class Location {
   Location() {
-    _geolocator = Geolocator()..forceAndroidLocationManager = true;
+    _geolocator = Geolocator();
   }
 
   Geolocator _geolocator;
