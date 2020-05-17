@@ -8,6 +8,7 @@ class NetworkHelper {
   final String url;
 
   dynamic getData() async {
+    print('getting from: $url');
     http.Response response = await http.get(url);
 
     dynamic data;
