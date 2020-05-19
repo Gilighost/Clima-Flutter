@@ -1,15 +1,42 @@
+import 'location.dart';
+import 'networking.dart';
+
+const openWeatherApiUrl = 'http://api.openweathermap.org/data/2.5/weather';
+const openWeatherApiKey = 'e5bb752d337aea8306adc3206b3a018b';
+
 class WeatherModel {
   int _condition;
   int _temperature;
   String _cityName;
 
   WeatherModel(dynamic weatherData) {
-    _condition = weatherData['weather'][0]['id'];
-    _temperature = weatherData['main']['temp'].toInt();
-    _cityName = weatherData['name'];
+    print(weatherData);
+    if (weatherData != null) {
+      _condition = weatherData['weather'][0]['id'];
+      _temperature = weatherData['main']['temp'].toInt();
+      _cityName = weatherData['name'];
+    }
   }
 
-  int get temperature => _temperature;
+  static Future<dynamic> getWeatherDataForCurrentLocation() async {
+    Location location = Location();
+    await location.getCurrentLocation();
+
+    return await _getWeatherData(
+      latitude: location.latitude,
+      longitude: location.longitude,
+    );
+  }
+
+  static Future<dynamic> _getWeatherData(
+      {double latitude, double longitude}) async {
+    NetworkHelper networkHelper = NetworkHelper(
+        '$openWeatherApiUrl?lat=$latitude&lon=$longitude&units=imperial&appid=$openWeatherApiKey');
+
+    return await networkHelper.getData();
+  }
+
+  String get temperature => _temperature != null ? '$_temperature°' : 'Error';
 
   String getWeatherIcon() {
     if (_condition < 300) {
@@ -37,10 +64,12 @@ class WeatherModel {
       message = 'It\'s 🍦 time';
     } else if (_temperature > 68) {
       message = 'Time for shorts and 👕';
+    } else if (_temperature >= 50) {
+      message = 'Bring a 🧥 just in case';
     } else if (_temperature < 50) {
       message = 'You\'ll need 🧣 and 🧤';
     } else {
-      message = 'Bring a 🧥 just in case';
+      return "Could not retrieve weather.";
     }
 
     return '$message in $_cityName';

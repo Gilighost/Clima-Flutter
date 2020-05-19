@@ -1,5 +1,3 @@
-import 'package:clima/services/location.dart';
-import 'package:clima/services/networking.dart';
 import 'package:clima/services/weather.dart';
 import 'package:flutter/material.dart';
 import 'location_screen.dart';
@@ -11,8 +9,6 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  dynamic weatherData;
-
   @override
   void initState() {
     super.initState();
@@ -21,15 +17,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
 
   void getWeatherDataForCurrentLocation() async {
-    Location location = Location();
-    print('Getting current location.');
-    await location.getCurrentLocation();
-    print('Got current location.');
-
-    await getWeatherData(
-      latitude: location.latitude,
-      longitude: location.longitude,
-    );
+    final weatherData = await WeatherModel.getWeatherDataForCurrentLocation();
 
     Navigator.push(
       context,
@@ -39,15 +27,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
         ),
       ),
     );
-  }
-
-  Future<void> getWeatherData({double latitude, double longitude}) async {
-    NetworkHelper networkHelper = NetworkHelper(
-        'http://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&units=imperial&APPID=e5bb752d337aea8306adc3206b3a018b');
-
-    print('Fetching weather...');
-    weatherData = await networkHelper.getData();
-    print('Got weather.');
   }
 
   @override
